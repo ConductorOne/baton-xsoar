@@ -34,11 +34,11 @@ func roleResource(ctx context.Context, role *demisto.Role) (*v2.Resource, error)
 		"role_permissions": rolePermissionsString,
 	}
 
-	resource, err := rs.NewGroupResource(
+	resource, err := rs.NewRoleResource(
 		role.Name,
 		resourceTypeRole,
 		role.Id,
-		[]rs.GroupTraitOption{rs.WithGroupProfile(profile)},
+		[]rs.RoleTraitOption{rs.WithRoleProfile(profile)},
 	)
 	if err != nil {
 		return nil, err
