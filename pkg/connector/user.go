@@ -30,14 +30,22 @@ func userResource(ctx context.Context, user *demisto.User) (*v2.Resource, error)
 		"last_name":  user.LastName,
 	}
 
+	userTraitOptions := []resource.UserTraitOption{
+		resource.WithEmail(user.Email, true),
+		resource.WithUserProfile(profile),
+	}
+
+	if user.Disabled {
+		userTraitOptions = append(userTraitOptions, resource.WithStatus(v2.UserTrait_Status_STATUS_DISABLED))
+	} else {
+		userTraitOptions = append(userTraitOptions, resource.WithStatus(v2.UserTrait_Status_STATUS_ENABLED))
+	}
+
 	ret, err := resource.NewUserResource(
 		user.Name,
 		resourceTypeUser,
 		user.Id,
-		[]resource.UserTraitOption{
-			resource.WithEmail(user.Email, true),
-			resource.WithUserProfile(profile),
-		},
+		userTraitOptions,
 	)
 	if err != nil {
 		return nil, err

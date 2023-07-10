@@ -15,6 +15,8 @@ type User struct {
 
 	Email string              `json:"email"`
 	Roles map[string][]string `json:"roles"`
+
+	Disabled bool `json:"disabled"`
 }
 
 type Role struct {
