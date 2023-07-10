@@ -17,6 +17,7 @@ import (
 )
 
 const roleMember = "member"
+const defaultAdminUser = "admin"
 
 type roleResourceType struct {
 	resourceType *v2.ResourceType
@@ -118,6 +119,15 @@ func (r *roleResourceType) Grants(ctx context.Context, resource *v2.Resource, _ 
 func (r *roleResourceType) Grant(ctx context.Context, principal *v2.Resource, entitlement *v2.Entitlement) (annotations.Annotations, error) {
 	l := ctxzap.Extract(ctx)
 
+	if principal.Id.Resource == defaultAdminUser {
+		l.Warn(
+			"demisto-connector: cannot grant role memberships to default admin user",
+			zap.String("principal_id", principal.Id.Resource),
+		)
+
+		return nil, fmt.Errorf("demisto-connector: cannot grant role memberships to default admin user")
+	}
+
 	if principal.Id.ResourceType != resourceTypeUser.Id {
 		l.Warn(
 			"demisto-connector: only users can be granted role membership",
@@ -191,6 +201,15 @@ func (r *roleResourceType) Revoke(ctx context.Context, grant *v2.Grant) (annotat
 
 	entitlement := grant.Entitlement
 	principal := grant.Principal
+
+	if principal.Id.Resource == defaultAdminUser {
+		l.Warn(
+			"demisto-connector: cannot revoke role memberships from default admin user",
+			zap.String("principal_id", principal.Id.Resource),
+		)
+
+		return nil, fmt.Errorf("demisto-connector: cannot revoke role memberships from default admin user")
+	}
 
 	if principal.Id.ResourceType != resourceTypeUser.Id {
 		l.Warn(
