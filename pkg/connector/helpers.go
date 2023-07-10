@@ -57,3 +57,27 @@ func removeRole(roles []string, targetRole string) []string {
 
 	return newRoles
 }
+
+func containsTargetUser(users []string, targetUser string) bool {
+	for _, user := range users {
+		if user == targetUser {
+			return true
+		}
+	}
+
+	return false
+}
+
+func removeUsers(users []demisto.User, targetUsers ...string) []demisto.User {
+	var newUsers []demisto.User
+
+	for _, user := range users {
+		if containsTargetUser(targetUsers, user.Id) {
+			continue
+		}
+
+		newUsers = append(newUsers, user)
+	}
+
+	return newUsers
+}

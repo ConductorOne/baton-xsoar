@@ -10,6 +10,8 @@ import (
 	"github.com/conductorone/baton-sdk/pkg/connectorbuilder"
 	"github.com/conductorone/baton-sdk/pkg/uhttp"
 	"github.com/grpc-ecosystem/go-grpc-middleware/logging/zap/ctxzap"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 var (
@@ -48,8 +50,39 @@ func (de *Demisto) Metadata(ctx context.Context) (*v2.ConnectorMetadata, error) 
 	}, nil
 }
 
+// Validate method checks for compatible and valid credentials.
+// Since each role can be configured to have different permissions,
+// we need to check if the provided credentials have the required
+// permissions to perform the operations.
 func (de *Demisto) Validate(ctx context.Context) (annotations.Annotations, error) {
-	// TODO: implement validation
+	currentUser, err := de.client.GetCurrentUser(ctx)
+	if err != nil {
+		return nil, status.Error(codes.Unauthenticated, "Provided Access Token is invalid - unable to get current user")
+	}
+
+	users, err := de.client.GetUsers(ctx)
+	if err != nil {
+		return nil, status.Error(codes.Unauthenticated, "Provided Access Token is invalid - unable to get users")
+	}
+
+	_, err = de.client.GetRoles(ctx)
+	if err != nil {
+		return nil, status.Error(codes.Unauthenticated, "Provided Access Token is invalid - unable to get roles")
+	}
+
+	targetUsers := removeUsers(users, "admin", currentUser.Id)
+	if len(targetUsers) == 0 {
+		return nil, nil
+	}
+
+	err = de.client.UpdateUserRoles(
+		ctx,
+		targetUsers[0].Id,
+		flattenRoleNames(targetUsers[0].Roles),
+	)
+	if err != nil {
+		return nil, status.Error(codes.Unauthenticated, "Provided Access Token is invalid - unable to update user roles")
+	}
 
 	return nil, nil
 }
