@@ -1,8 +1,10 @@
 package demisto
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
+	"io"
 	"net/http"
 
 	"google.golang.org/grpc/codes"
@@ -10,8 +12,10 @@ import (
 )
 
 const BaseURL = "https://localhost:8443"
+const CurrentUserBaseURL = BaseURL + "/user"
 const UsersBaseURL = BaseURL + "/users"
 const RolesBaseURL = BaseURL + "/roles"
+const UpdateUserBaseURL = BaseURL + "/users/update"
 
 type Client struct {
 	httpClient *http.Client
@@ -31,7 +35,7 @@ func NewClient(httpClient *http.Client, token string) *Client {
 func (c *Client) GetUsers(ctx context.Context) ([]User, error) {
 	var usersResponse UsersResponse
 
-	err := c.doRequest(ctx, UsersBaseURL, &usersResponse)
+	err := c.doRequest(ctx, http.MethodGet, UsersBaseURL, &usersResponse, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +46,7 @@ func (c *Client) GetUsers(ctx context.Context) ([]User, error) {
 func (c *Client) GetRoles(ctx context.Context) ([]Role, error) {
 	var rolesResponse RolesResponse
 
-	err := c.doRequest(ctx, RolesBaseURL, &rolesResponse)
+	err := c.doRequest(ctx, http.MethodGet, RolesBaseURL, &rolesResponse, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -50,12 +54,66 @@ func (c *Client) GetRoles(ctx context.Context) ([]Role, error) {
 	return rolesResponse, nil
 }
 
+func (c *Client) GetCurrentUser(ctx context.Context) (*User, error) {
+	var user User
+
+	err := c.doRequest(ctx, http.MethodGet, CurrentUserBaseURL, &user, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+}
+
+type Roles struct {
+	Roles []string `json:"roles"`
+}
+
+type UpdateRolesBody struct {
+	Id    string `json:"id"`
+	Roles Roles  `json:"roles"`
+}
+
+func (c *Client) UpdateUserRoles(ctx context.Context, userId string, roleIds []string) error {
+	data := UpdateRolesBody{
+		Id: userId,
+		Roles: Roles{
+			Roles: roleIds,
+		},
+	}
+
+	err := c.doRequest(ctx, http.MethodPost, UpdateUserBaseURL, nil, &data)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (c *Client) doRequest(
 	ctx context.Context,
+	method string,
 	urlAddress string,
 	resourceResponse interface{},
+	data interface{},
 ) error {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, urlAddress, nil)
+	var body io.Reader
+
+	if data != nil {
+		jsonBody, err := json.Marshal(data)
+		if err != nil {
+			return err
+		}
+
+		body = bytes.NewBuffer(jsonBody)
+	}
+
+	req, err := http.NewRequestWithContext(
+		ctx,
+		method,
+		urlAddress,
+		body,
+	)
 	if err != nil {
 		return err
 	}

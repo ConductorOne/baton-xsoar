@@ -1,6 +1,7 @@
 package connector
 
 import (
+	"github.com/ConductorOne/baton-demisto/pkg/demisto"
 	v2 "github.com/conductorone/baton-sdk/pb/c1/connector/v2"
 	"github.com/conductorone/baton-sdk/pkg/annotations"
 )
@@ -31,4 +32,28 @@ func containsRole(roles []string, role string) bool {
 	}
 
 	return false
+}
+
+func findUser(users []demisto.User, id string) *demisto.User {
+	for _, user := range users {
+		if user.Id == id {
+			return &user
+		}
+	}
+
+	return nil
+}
+
+func removeRole(roles []string, targetRole string) []string {
+	var newRoles []string
+
+	for _, role := range roles {
+		if role == targetRole {
+			continue
+		}
+
+		newRoles = append(newRoles, role)
+	}
+
+	return newRoles
 }

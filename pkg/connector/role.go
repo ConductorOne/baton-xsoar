@@ -12,6 +12,8 @@ import (
 	ent "github.com/conductorone/baton-sdk/pkg/types/entitlement"
 	"github.com/conductorone/baton-sdk/pkg/types/grant"
 	rs "github.com/conductorone/baton-sdk/pkg/types/resource"
+	"github.com/grpc-ecosystem/go-grpc-middleware/logging/zap/ctxzap"
+	"go.uber.org/zap"
 )
 
 const roleMember = "member"
@@ -111,6 +113,162 @@ func (r *roleResourceType) Grants(ctx context.Context, resource *v2.Resource, _ 
 	}
 
 	return rv, "", nil, nil
+}
+
+func (r *roleResourceType) Grant(ctx context.Context, principal *v2.Resource, entitlement *v2.Entitlement) (annotations.Annotations, error) {
+	l := ctxzap.Extract(ctx)
+
+	if principal.Id.ResourceType != resourceTypeUser.Id {
+		l.Warn(
+			"demisto-connector: only users can be granted role membership",
+			zap.String("principal_type", principal.Id.ResourceType),
+			zap.String("principal_id", principal.Id.Resource),
+		)
+
+		return nil, fmt.Errorf("demisto-connector: only users can be granted role membership")
+	}
+
+	// fetch the current user
+	currentUser, err := r.client.GetCurrentUser(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("demisto-connector: failed to get current user: %w", err)
+	}
+
+	// check if the principal is current user
+	if principal.Id.Resource == currentUser.Id {
+		l.Warn(
+			"demisto-connector: cannot grant role membership to current user",
+			zap.String("principal_id", principal.Id.Resource),
+			zap.String("current_user_id", currentUser.Id),
+		)
+
+		return nil, fmt.Errorf("demisto-connector: cannot grant role membership to current user")
+	}
+
+	users, err := r.client.GetUsers(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("demisto-connector: failed to get users: %w", err)
+	}
+
+	targetUser := findUser(users, principal.Id.Resource)
+	if targetUser == nil {
+		l.Warn(
+			"demisto-connector: failed to find user to grant role membership",
+			zap.String("principal_id", principal.Id.Resource),
+		)
+
+		return nil, fmt.Errorf("demisto-connector: failed to find user to grant role membership")
+	}
+
+	userRoles := flattenRoleNames(targetUser.Roles)
+	targetRole := entitlement.Resource
+
+	// check if role to be granted is already present
+	if containsRole(userRoles, targetRole.DisplayName) {
+		l.Warn(
+			"demisto-connector: role membership already granted",
+			zap.String("principal_id", principal.Id.Resource),
+			zap.String("role", targetRole.DisplayName),
+		)
+
+		return nil, fmt.Errorf("demisto-connector: role membership %s already granted", targetRole.DisplayName)
+	}
+
+	err = r.client.UpdateUserRoles(
+		ctx,
+		targetUser.Id,
+		append(userRoles, targetRole.DisplayName),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("demisto-connector: failed to update user roles: %w", err)
+	}
+
+	return nil, nil
+}
+
+func (r *roleResourceType) Revoke(ctx context.Context, grant *v2.Grant) (annotations.Annotations, error) {
+	l := ctxzap.Extract(ctx)
+
+	entitlement := grant.Entitlement
+	principal := grant.Principal
+
+	if principal.Id.ResourceType != resourceTypeUser.Id {
+		l.Warn(
+			"demisto-connector: only users can have role membership revoked",
+			zap.String("principal_type", principal.Id.ResourceType),
+			zap.String("principal_id", principal.Id.Resource),
+		)
+	}
+
+	currentUser, err := r.client.GetCurrentUser(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("demisto-connector: failed to get current user: %w", err)
+	}
+
+	// check if the principal is current user
+	if principal.Id.Resource == currentUser.Id {
+		l.Warn(
+			"demisto-connector: cannot revoke role membership from current user",
+			zap.String("principal_id", principal.Id.Resource),
+			zap.String("current_user_id", currentUser.Id),
+		)
+
+		return nil, fmt.Errorf("demisto-connector: cannot revoke role membership from current user")
+	}
+
+	users, err := r.client.GetUsers(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("demisto-connector: failed to get users: %w", err)
+	}
+
+	targetUser := findUser(users, principal.Id.Resource)
+	if targetUser == nil {
+		l.Warn(
+			"demisto-connector: failed to find user to revoke role membership",
+			zap.String("principal_id", principal.Id.Resource),
+		)
+
+		return nil, fmt.Errorf("demisto-connector: failed to find user to revoke role membership")
+	}
+
+	userRoles := flattenRoleNames(targetUser.Roles)
+	targetRole := entitlement.Resource
+
+	// check if role to be revoked is not present
+	if !containsRole(userRoles, targetRole.DisplayName) {
+		l.Warn(
+			"demisto-connector: role membership already revoked",
+			zap.String("principal_id", principal.Id.Resource),
+			zap.String("role", targetRole.DisplayName),
+		)
+
+		return nil, fmt.Errorf("demisto-connector: %s role membership already revoked", targetRole.DisplayName)
+	}
+
+	// check if revoked role is not last one existing
+	if len(userRoles) == 1 {
+		l.Warn(
+			"demisto-connector: cannot revoke last role membership",
+			zap.String("principal_id", principal.Id.Resource),
+			zap.String("role", targetRole.DisplayName),
+		)
+
+		return nil, fmt.Errorf("demisto-connector: cannot revoke last role membership")
+	}
+
+	// remove the role from the user roles
+	updatedUserRoles := removeRole(userRoles, targetRole.DisplayName)
+
+	err = r.client.UpdateUserRoles(
+		ctx,
+		targetUser.Id,
+		updatedUserRoles,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("demisto-connector: failed to update user roles: %w", err)
+	}
+
+	return nil, nil
 }
 
 func roleBuilder(client *demisto.Client) *roleResourceType {
