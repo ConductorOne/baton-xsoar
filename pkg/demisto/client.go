@@ -21,17 +21,17 @@ const UpdateUserBaseURL = BaseURL + "/users/update"
 type Client struct {
 	httpClient *http.Client
 	Token      string
-	Domain     string
+	ApiUrl     string
 }
 
 type UsersResponse = []User
 type RolesResponse = []Role
 
-func NewClient(httpClient *http.Client, token, domain string) *Client {
+func NewClient(httpClient *http.Client, token, api_url string) *Client {
 	return &Client{
 		httpClient: httpClient,
 		Token:      token,
-		Domain:     domain,
+		ApiUrl:     api_url,
 	}
 }
 
@@ -41,7 +41,7 @@ func (c *Client) GetUsers(ctx context.Context) ([]User, error) {
 	err := c.doRequest(
 		ctx,
 		http.MethodGet,
-		fmt.Sprintf(UsersBaseURL, c.Domain),
+		fmt.Sprintf(UsersBaseURL, c.ApiUrl),
 		&usersResponse,
 		nil,
 	)
@@ -58,7 +58,7 @@ func (c *Client) GetRoles(ctx context.Context) ([]Role, error) {
 	err := c.doRequest(
 		ctx,
 		http.MethodGet,
-		fmt.Sprintf(RolesBaseURL, c.Domain),
+		fmt.Sprintf(RolesBaseURL, c.ApiUrl),
 		&rolesResponse,
 		nil,
 	)
@@ -75,7 +75,7 @@ func (c *Client) GetCurrentUser(ctx context.Context) (*User, error) {
 	err := c.doRequest(
 		ctx,
 		http.MethodGet,
-		fmt.Sprintf(CurrentUserBaseURL, c.Domain),
+		fmt.Sprintf(CurrentUserBaseURL, c.ApiUrl),
 		&user,
 		nil,
 	)
@@ -106,7 +106,7 @@ func (c *Client) UpdateUserRoles(ctx context.Context, userId string, roleIds []s
 	err := c.doRequest(
 		ctx,
 		http.MethodPost,
-		fmt.Sprintf(UpdateUserBaseURL, c.Domain),
+		fmt.Sprintf(UpdateUserBaseURL, c.ApiUrl),
 		nil,
 		&data,
 	)

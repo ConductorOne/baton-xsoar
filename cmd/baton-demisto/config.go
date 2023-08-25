@@ -14,7 +14,7 @@ type config struct {
 
 	AccessToken string `mapstructure:"token"`
 	Unsafe      bool   `mapstructure:"unsafe"`
-	Domain      string `mapstructure:"domain"`
+	ApiUrl      string `mapstructure:"api-url"`
 }
 
 // validateConfig is run after the configuration is loaded, and should return an error if it isn't valid.
@@ -23,8 +23,8 @@ func validateConfig(ctx context.Context, cfg *config) error {
 		return fmt.Errorf("an access token must be provided")
 	}
 
-	if cfg.Domain == "" {
-		return fmt.Errorf("a domain of the Cortex XSOAR instance must be provided")
+	if cfg.ApiUrl == "" {
+		return fmt.Errorf("the API URL of the Cortex XSOAR instance must be provided")
 	}
 
 	return nil
@@ -34,5 +34,5 @@ func validateConfig(ctx context.Context, cfg *config) error {
 func cmdFlags(cmd *cobra.Command) {
 	cmd.PersistentFlags().String("token", "", "Access token used to connect to the Cortex XSOAR API. ($BATON_TOKEN)")
 	cmd.PersistentFlags().Bool("unsafe", false, "Allow insecure TLS connections to Cortex XSOAR instance. ($BATON_UNSAFE)")
-	cmd.PersistentFlags().String("domain", "", "Domain of the Cortex XSOAR instance. ($BATON_API_URL)")
+	cmd.PersistentFlags().String("api_url", "", "The API URL of the Cortex XSOAR instance. ($BATON_API_URL)")
 }

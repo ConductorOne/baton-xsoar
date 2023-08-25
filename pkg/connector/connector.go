@@ -87,7 +87,7 @@ func (de *Demisto) Validate(ctx context.Context) (annotations.Annotations, error
 	return nil, nil
 }
 
-func New(ctx context.Context, token, domain string, unsafe bool) (*Demisto, error) {
+func New(ctx context.Context, token, api_url string, unsafe bool) (*Demisto, error) {
 	options := []uhttp.Option{
 		uhttp.WithLogger(true, ctxzap.Extract(ctx)),
 	}
@@ -111,6 +111,6 @@ func New(ctx context.Context, token, domain string, unsafe bool) (*Demisto, erro
 	}
 
 	return &Demisto{
-		client: demisto.NewClient(httpClient, token, domain),
+		client: demisto.NewClient(httpClient, token, api_url),
 	}, nil
 }
