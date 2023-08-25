@@ -38,7 +38,7 @@ func main() {
 func getConnector(ctx context.Context, cfg *config) (types.ConnectorServer, error) {
 	l := ctxzap.Extract(ctx)
 
-	demistoConnector, err := connector.New(ctx, cfg.AccessToken, cfg.Unsafe)
+	demistoConnector, err := connector.New(ctx, cfg.AccessToken, cfg.Domain, cfg.Unsafe)
 	if err != nil {
 		l.Error("error creating connector", zap.Error(err))
 		return nil, err
