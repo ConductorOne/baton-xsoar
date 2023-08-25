@@ -73,7 +73,7 @@ Available Commands:
 Flags:
       --client-id string       The client ID used to authenticate with ConductorOne ($BATON_CLIENT_ID)
       --client-secret string   The client secret used to authenticate with ConductorOne ($BATON_CLIENT_SECRET)
-      --domain string          Domain of the Cortex XSOAR instance. ($BATON_DOMAIN) (default "localhost")
+      --domain string          Domain of the Cortex XSOAR instance. ($BATON_API_URL) (default "localhost")
   -f, --file string            The path to the c1z file to sync with ($BATON_FILE) (default "sync.c1z")
   -h, --help                   help for baton-demisto
       --log-format string      The output format for logs: json, console ($BATON_LOG_FORMAT) (default "json")
