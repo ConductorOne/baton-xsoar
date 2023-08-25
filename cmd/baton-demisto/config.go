@@ -34,5 +34,5 @@ func validateConfig(ctx context.Context, cfg *config) error {
 func cmdFlags(cmd *cobra.Command) {
 	cmd.PersistentFlags().String("token", "", "Access token used to connect to the Cortex XSOAR API. ($BATON_TOKEN)")
 	cmd.PersistentFlags().Bool("unsafe", false, "Allow insecure TLS connections to Cortex XSOAR instance. ($BATON_UNSAFE)")
-	cmd.PersistentFlags().String("api_url", "", "The API URL of the Cortex XSOAR instance. ($BATON_API_URL)")
+	cmd.PersistentFlags().String("api-url", "", "The API URL of the Cortex XSOAR instance. ($BATON_API_URL)")
 }

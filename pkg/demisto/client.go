@@ -27,11 +27,11 @@ type Client struct {
 type UsersResponse = []User
 type RolesResponse = []Role
 
-func NewClient(httpClient *http.Client, token, api_url string) *Client {
+func NewClient(httpClient *http.Client, token, apiUrl string) *Client {
 	return &Client{
 		httpClient: httpClient,
 		Token:      token,
-		ApiUrl:     api_url,
+		ApiUrl:     apiUrl,
 	}
 }
 
