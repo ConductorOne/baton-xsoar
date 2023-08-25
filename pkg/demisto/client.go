@@ -12,7 +12,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-const BaseURL = "https://%s"
+const BaseURL = "%s"
 const CurrentUserBaseURL = BaseURL + "/user"
 const UsersBaseURL = BaseURL + "/users"
 const RolesBaseURL = BaseURL + "/roles"
