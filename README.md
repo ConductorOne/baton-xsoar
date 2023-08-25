@@ -71,16 +71,15 @@ Available Commands:
   help               Help about any command
 
 Flags:
-      --client-id string              The client ID used to authenticate with ConductorOne ($BATON_CLIENT_ID)
-      --client-secret string          The client secret used to authenticate with ConductorOne ($BATON_CLIENT_SECRET)
-  -f, --file string                   The path to the c1z file to sync with ($BATON_FILE) (default "sync.c1z")
-  -h, --help                          help for baton-demisto
-      --log-format string             The output format for logs: json, console ($BATON_LOG_FORMAT) (default "json")
-      --log-level string              The log level: debug, info, warn, error ($BATON_LOG_LEVEL) (default "info")
-      --token string                  Access token used to connect to the Cortex XSOAR API. ($BATON_TOKEN)
-      --unsafe                        Allow insecure TLS connections to Cortex XSOAR instance. ($BATON_UNSAFE)
-  -v, --version                       version for baton-demisto
+      --client-id string       The client ID used to authenticate with ConductorOne ($BATON_CLIENT_ID)
+      --client-secret string   The client secret used to authenticate with ConductorOne ($BATON_CLIENT_SECRET)
+  -f, --file string            The path to the c1z file to sync with ($BATON_FILE) (default "sync.c1z")
+  -h, --help                   help for baton-demisto
+      --log-format string      The output format for logs: json, console ($BATON_LOG_FORMAT) (default "json")
+      --log-level string       The log level: debug, info, warn, error ($BATON_LOG_LEVEL) (default "info")
+      --token string           Access token used to connect to the Cortex XSOAR API. ($BATON_TOKEN)
+      --unsafe                 Allow insecure TLS connections to Cortex XSOAR instance. ($BATON_UNSAFE)
+  -v, --version                version for baton-demisto
 
 Use "baton-demisto [command] --help" for more information about a command.
-
 ```
