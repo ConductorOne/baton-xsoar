@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
+	"path"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -41,7 +41,7 @@ func (c *Client) GetUsers(ctx context.Context) ([]User, error) {
 	err := c.doRequest(
 		ctx,
 		http.MethodGet,
-		fmt.Sprintf(UsersBaseURL, c.ApiUrl),
+		path.Join(UsersBaseURL, c.ApiUrl),
 		&usersResponse,
 		nil,
 	)
@@ -58,7 +58,7 @@ func (c *Client) GetRoles(ctx context.Context) ([]Role, error) {
 	err := c.doRequest(
 		ctx,
 		http.MethodGet,
-		fmt.Sprintf(RolesBaseURL, c.ApiUrl),
+		path.Join(RolesBaseURL, c.ApiUrl),
 		&rolesResponse,
 		nil,
 	)
@@ -75,7 +75,7 @@ func (c *Client) GetCurrentUser(ctx context.Context) (*User, error) {
 	err := c.doRequest(
 		ctx,
 		http.MethodGet,
-		fmt.Sprintf(CurrentUserBaseURL, c.ApiUrl),
+		path.Join(CurrentUserBaseURL, c.ApiUrl),
 		&user,
 		nil,
 	)
@@ -106,7 +106,7 @@ func (c *Client) UpdateUserRoles(ctx context.Context, userId string, roleIds []s
 	err := c.doRequest(
 		ctx,
 		http.MethodPost,
-		fmt.Sprintf(UpdateUserBaseURL, c.ApiUrl),
+		path.Join(UpdateUserBaseURL, c.ApiUrl),
 		nil,
 		&data,
 	)
