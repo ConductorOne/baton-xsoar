@@ -4,19 +4,21 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
-	"path"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
-const BaseURL = "%s"
-const CurrentUserBaseURL = BaseURL + "/user"
-const UsersBaseURL = BaseURL + "/users"
-const RolesBaseURL = BaseURL + "/roles"
-const UpdateUserBaseURL = BaseURL + "/users/update"
+const (
+	ApiBaseURL         = "%s"
+	CurrentUserBaseURL = ApiBaseURL + "/user"
+	UsersBaseURL       = ApiBaseURL + "/users"
+	RolesBaseURL       = ApiBaseURL + "/roles"
+	UpdateUserBaseURL  = ApiBaseURL + "/users/update"
+)
 
 type Client struct {
 	httpClient *http.Client
@@ -41,7 +43,7 @@ func (c *Client) GetUsers(ctx context.Context) ([]User, error) {
 	err := c.doRequest(
 		ctx,
 		http.MethodGet,
-		path.Join(UsersBaseURL, c.ApiUrl),
+		fmt.Sprintf(UsersBaseURL, c.ApiUrl),
 		&usersResponse,
 		nil,
 	)
@@ -58,7 +60,7 @@ func (c *Client) GetRoles(ctx context.Context) ([]Role, error) {
 	err := c.doRequest(
 		ctx,
 		http.MethodGet,
-		path.Join(RolesBaseURL, c.ApiUrl),
+		fmt.Sprintf(RolesBaseURL, c.ApiUrl),
 		&rolesResponse,
 		nil,
 	)
@@ -75,7 +77,7 @@ func (c *Client) GetCurrentUser(ctx context.Context) (*User, error) {
 	err := c.doRequest(
 		ctx,
 		http.MethodGet,
-		path.Join(CurrentUserBaseURL, c.ApiUrl),
+		fmt.Sprintf(CurrentUserBaseURL, c.ApiUrl),
 		&user,
 		nil,
 	)
@@ -106,7 +108,7 @@ func (c *Client) UpdateUserRoles(ctx context.Context, userId string, roleIds []s
 	err := c.doRequest(
 		ctx,
 		http.MethodPost,
-		path.Join(UpdateUserBaseURL, c.ApiUrl),
+		fmt.Sprintf(UpdateUserBaseURL, c.ApiUrl),
 		nil,
 		&data,
 	)
