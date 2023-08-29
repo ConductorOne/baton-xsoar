@@ -1,4 +1,4 @@
-package demisto
+package xsoar
 
 type BaseResource struct {
 	Id      string `json:"id"`

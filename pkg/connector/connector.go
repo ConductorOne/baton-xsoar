@@ -4,11 +4,11 @@ import (
 	"context"
 	"crypto/tls"
 
-	"github.com/ConductorOne/baton-demisto/pkg/demisto"
 	v2 "github.com/conductorone/baton-sdk/pb/c1/connector/v2"
 	"github.com/conductorone/baton-sdk/pkg/annotations"
 	"github.com/conductorone/baton-sdk/pkg/connectorbuilder"
 	"github.com/conductorone/baton-sdk/pkg/uhttp"
+	"github.com/conductorone/baton-xsoar/pkg/xsoar"
 	"github.com/grpc-ecosystem/go-grpc-middleware/logging/zap/ctxzap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -32,21 +32,21 @@ var (
 	}
 )
 
-type Demisto struct {
-	client *demisto.Client
+type Xsoar struct {
+	client *xsoar.Client
 }
 
-func (de *Demisto) ResourceSyncers(ctx context.Context) []connectorbuilder.ResourceSyncer {
+func (xs *Xsoar) ResourceSyncers(ctx context.Context) []connectorbuilder.ResourceSyncer {
 	return []connectorbuilder.ResourceSyncer{
-		userBuilder(de.client),
-		roleBuilder(de.client),
+		userBuilder(xs.client),
+		roleBuilder(xs.client),
 	}
 }
 
-func (de *Demisto) Metadata(ctx context.Context) (*v2.ConnectorMetadata, error) {
+func (xs *Xsoar) Metadata(ctx context.Context) (*v2.ConnectorMetadata, error) {
 	return &v2.ConnectorMetadata{
-		DisplayName: "Demisto",
-		Description: "Connector syncing Demisto/Cortex XSOAR users and their roles to Baton.",
+		DisplayName: "Xsoar",
+		Description: "Connector syncing Xsoar/Cortex XSOAR users and their roles to Baton.",
 	}, nil
 }
 
@@ -54,18 +54,18 @@ func (de *Demisto) Metadata(ctx context.Context) (*v2.ConnectorMetadata, error) 
 // Since each role can be configured to have different permissions,
 // we need to check if the provided credentials have the required
 // permissions to perform the operations.
-func (de *Demisto) Validate(ctx context.Context) (annotations.Annotations, error) {
-	currentUser, err := de.client.GetCurrentUser(ctx)
+func (xs *Xsoar) Validate(ctx context.Context) (annotations.Annotations, error) {
+	currentUser, err := xs.client.GetCurrentUser(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Unauthenticated, "Provided Access Token is invalid - unable to get current user")
 	}
 
-	users, err := de.client.GetUsers(ctx)
+	users, err := xs.client.GetUsers(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Unauthenticated, "Provided Access Token is invalid - unable to get users")
 	}
 
-	_, err = de.client.GetRoles(ctx)
+	_, err = xs.client.GetRoles(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Unauthenticated, "Provided Access Token is invalid - unable to get roles")
 	}
@@ -75,7 +75,7 @@ func (de *Demisto) Validate(ctx context.Context) (annotations.Annotations, error
 		return nil, nil
 	}
 
-	err = de.client.UpdateUserRoles(
+	err = xs.client.UpdateUserRoles(
 		ctx,
 		targetUsers[0].Id,
 		flattenRoleNames(targetUsers[0].Roles),
@@ -87,7 +87,7 @@ func (de *Demisto) Validate(ctx context.Context) (annotations.Annotations, error
 	return nil, nil
 }
 
-func New(ctx context.Context, token, apiUrl string, unsafe bool) (*Demisto, error) {
+func New(ctx context.Context, token, apiUrl string, unsafe bool) (*Xsoar, error) {
 	options := []uhttp.Option{
 		uhttp.WithLogger(true, ctxzap.Extract(ctx)),
 	}
@@ -110,7 +110,7 @@ func New(ctx context.Context, token, apiUrl string, unsafe bool) (*Demisto, erro
 		return nil, err
 	}
 
-	return &Demisto{
-		client: demisto.NewClient(httpClient, token, apiUrl),
+	return &Xsoar{
+		client: xsoar.NewClient(httpClient, token, apiUrl),
 	}, nil
 }

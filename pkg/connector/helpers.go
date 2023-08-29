@@ -1,9 +1,9 @@
 package connector
 
 import (
-	"github.com/ConductorOne/baton-demisto/pkg/demisto"
 	v2 "github.com/conductorone/baton-sdk/pb/c1/connector/v2"
 	"github.com/conductorone/baton-sdk/pkg/annotations"
+	"github.com/conductorone/baton-xsoar/pkg/xsoar"
 )
 
 const ResourcesPageSize = 50
@@ -34,7 +34,7 @@ func containsRole(roles []string, role string) bool {
 	return false
 }
 
-func findUser(users []demisto.User, id string) *demisto.User {
+func findUser(users []xsoar.User, id string) *xsoar.User {
 	for _, user := range users {
 		if user.Id == id {
 			return &user
@@ -68,8 +68,8 @@ func containsTargetUser(users []string, targetUser string) bool {
 	return false
 }
 
-func removeUsers(users []demisto.User, targetUsers ...string) []demisto.User {
-	var newUsers []demisto.User
+func removeUsers(users []xsoar.User, targetUsers ...string) []xsoar.User {
+	var newUsers []xsoar.User
 
 	for _, user := range users {
 		if containsTargetUser(targetUsers, user.Id) {

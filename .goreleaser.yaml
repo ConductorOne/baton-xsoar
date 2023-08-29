@@ -1,20 +1,20 @@
-project_name: baton-demisto
+project_name: baton-xsoar
 builds:
-  - binary: baton-demisto
+  - binary: baton-xsoar
     env:
       - CGO_ENABLED=0
     id: linux
-    main: ./cmd/baton-demisto
+    main: ./cmd/baton-xsoar
     goos:
       - linux
     goarch:
       - amd64
       - arm64
-  - binary: baton-demisto
+  - binary: baton-xsoar
     env:
       - CGO_ENABLED=0
     id: macos-amd64
-    main: ./cmd/baton-demisto
+    main: ./cmd/baton-xsoar
     goos:
       - darwin
     goarch:
@@ -22,12 +22,12 @@ builds:
     hooks:
       post:
         - gon .gon-amd64.json
-        - mv dist/baton-demisto-darwin-amd64.signed.zip dist/macos-amd64_darwin_amd64_v1/baton-demisto
-  - binary: baton-demisto
+        - mv dist/baton-xsoar-darwin-amd64.signed.zip dist/macos-amd64_darwin_amd64_v1/baton-xsoar
+  - binary: baton-xsoar
     env:
       - CGO_ENABLED=0
     id: macos-arm64
-    main: ./cmd/baton-demisto
+    main: ./cmd/baton-xsoar
     goos:
       - darwin
     goarch:
@@ -35,7 +35,7 @@ builds:
     hooks:
       post:
         - gon .gon-arm64.json
-        - mv dist/baton-demisto-darwin-arm64.signed.zip dist/macos-arm64_darwin_arm64/baton-demisto
+        - mv dist/baton-xsoar-darwin-arm64.signed.zip dist/macos-arm64_darwin_arm64/baton-xsoar
 archives:
   - id: linux-archive
     builds:
@@ -71,9 +71,9 @@ brews:
     folder: Formula
     homepage: https://conductorone.com
     test: |
-      system "#{bin}/baton-demisto -v"
+      system "#{bin}/baton-xsoar -v"
     install: |-
-      bin.install "baton-demisto"
+      bin.install "baton-xsoar"
 changelog:
   filters:
     exclude:

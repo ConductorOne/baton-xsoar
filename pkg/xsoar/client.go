@@ -1,4 +1,4 @@
-package demisto
+package xsoar
 
 import (
 	"bytes"

@@ -4,24 +4,24 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/ConductorOne/baton-demisto/pkg/demisto"
 	v2 "github.com/conductorone/baton-sdk/pb/c1/connector/v2"
 	"github.com/conductorone/baton-sdk/pkg/annotations"
 	"github.com/conductorone/baton-sdk/pkg/pagination"
 	"github.com/conductorone/baton-sdk/pkg/types/resource"
+	"github.com/conductorone/baton-xsoar/pkg/xsoar"
 )
 
 type userResourceType struct {
 	resourceType *v2.ResourceType
-	client       *demisto.Client
+	client       *xsoar.Client
 }
 
 func (u *userResourceType) ResourceType(_ context.Context) *v2.ResourceType {
 	return u.resourceType
 }
 
-// Create a new connector resource for a demisto User.
-func userResource(ctx context.Context, user *demisto.User) (*v2.Resource, error) {
+// Create a new connector resource for a xsoar User.
+func userResource(ctx context.Context, user *xsoar.User) (*v2.Resource, error) {
 	profile := map[string]interface{}{
 		"login":      user.Username,
 		"user_id":    user.Id,
@@ -57,7 +57,7 @@ func userResource(ctx context.Context, user *demisto.User) (*v2.Resource, error)
 func (u *userResourceType) List(ctx context.Context, _ *v2.ResourceId, _ *pagination.Token) ([]*v2.Resource, string, annotations.Annotations, error) {
 	users, err := u.client.GetUsers(ctx)
 	if err != nil {
-		return nil, "", nil, fmt.Errorf("demisto-connector: failed to list users: %w", err)
+		return nil, "", nil, fmt.Errorf("xsoar-connector: failed to list users: %w", err)
 	}
 
 	rv := make([]*v2.Resource, 0, len(users))
@@ -83,7 +83,7 @@ func (u *userResourceType) Grants(_ context.Context, _ *v2.Resource, _ *paginati
 	return nil, "", nil, nil
 }
 
-func userBuilder(client *demisto.Client) *userResourceType {
+func userBuilder(client *xsoar.Client) *userResourceType {
 	return &userResourceType{
 		resourceType: resourceTypeUser,
 		client:       client,
