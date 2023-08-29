@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"net/url"
 
 	"github.com/conductorone/baton-sdk/pkg/cli"
 	"github.com/spf13/cobra"
@@ -25,6 +26,13 @@ func validateConfig(ctx context.Context, cfg *config) error {
 
 	if cfg.ApiUrl == "" {
 		return fmt.Errorf("the API URL of the Cortex XSOAR instance must be provided")
+	}
+	parsedApiUrl, err := url.Parse(cfg.ApiUrl)
+	if err != nil {
+		return fmt.Errorf("failed to parse the API URL: %w", err)
+	}
+	if parsedApiUrl.Scheme != "https" {
+		return fmt.Errorf("the API URL must use the HTTPS scheme")
 	}
 
 	return nil
