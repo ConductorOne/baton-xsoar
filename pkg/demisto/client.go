@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 
@@ -11,31 +12,41 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-const BaseURL = "https://localhost:8443"
-const CurrentUserBaseURL = BaseURL + "/user"
-const UsersBaseURL = BaseURL + "/users"
-const RolesBaseURL = BaseURL + "/roles"
-const UpdateUserBaseURL = BaseURL + "/users/update"
+const (
+	ApiBaseURL         = "%s"
+	CurrentUserBaseURL = ApiBaseURL + "/user"
+	UsersBaseURL       = ApiBaseURL + "/users"
+	RolesBaseURL       = ApiBaseURL + "/roles"
+	UpdateUserBaseURL  = ApiBaseURL + "/users/update"
+)
 
 type Client struct {
 	httpClient *http.Client
 	Token      string
+	ApiUrl     string
 }
 
 type UsersResponse = []User
 type RolesResponse = []Role
 
-func NewClient(httpClient *http.Client, token string) *Client {
+func NewClient(httpClient *http.Client, token, apiUrl string) *Client {
 	return &Client{
 		httpClient: httpClient,
 		Token:      token,
+		ApiUrl:     apiUrl,
 	}
 }
 
 func (c *Client) GetUsers(ctx context.Context) ([]User, error) {
 	var usersResponse UsersResponse
 
-	err := c.doRequest(ctx, http.MethodGet, UsersBaseURL, &usersResponse, nil)
+	err := c.doRequest(
+		ctx,
+		http.MethodGet,
+		fmt.Sprintf(UsersBaseURL, c.ApiUrl),
+		&usersResponse,
+		nil,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +57,13 @@ func (c *Client) GetUsers(ctx context.Context) ([]User, error) {
 func (c *Client) GetRoles(ctx context.Context) ([]Role, error) {
 	var rolesResponse RolesResponse
 
-	err := c.doRequest(ctx, http.MethodGet, RolesBaseURL, &rolesResponse, nil)
+	err := c.doRequest(
+		ctx,
+		http.MethodGet,
+		fmt.Sprintf(RolesBaseURL, c.ApiUrl),
+		&rolesResponse,
+		nil,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +74,13 @@ func (c *Client) GetRoles(ctx context.Context) ([]Role, error) {
 func (c *Client) GetCurrentUser(ctx context.Context) (*User, error) {
 	var user User
 
-	err := c.doRequest(ctx, http.MethodGet, CurrentUserBaseURL, &user, nil)
+	err := c.doRequest(
+		ctx,
+		http.MethodGet,
+		fmt.Sprintf(CurrentUserBaseURL, c.ApiUrl),
+		&user,
+		nil,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -82,7 +105,13 @@ func (c *Client) UpdateUserRoles(ctx context.Context, userId string, roleIds []s
 		},
 	}
 
-	err := c.doRequest(ctx, http.MethodPost, UpdateUserBaseURL, nil, &data)
+	err := c.doRequest(
+		ctx,
+		http.MethodPost,
+		fmt.Sprintf(UpdateUserBaseURL, c.ApiUrl),
+		nil,
+		&data,
+	)
 	if err != nil {
 		return err
 	}
