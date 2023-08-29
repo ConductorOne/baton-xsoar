@@ -1,9 +1,9 @@
-module github.com/ConductorOne/baton-demisto
+module github.com/conductorone/baton-xsoar
 
-go 1.19
+go 1.20
 
 require (
-	github.com/conductorone/baton-sdk v0.1.4
+	github.com/conductorone/baton-sdk v0.1.5
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/spf13/cobra v1.7.0
 	go.uber.org/zap v1.25.0

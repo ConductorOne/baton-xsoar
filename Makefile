@@ -3,14 +3,14 @@ GOARCH = $(shell go env GOARCH)
 BUILD_DIR = dist/${GOOS}_${GOARCH}
 
 ifeq ($(GOOS),windows)
-OUTPUT_PATH = ${BUILD_DIR}/baton-demisto.exe
+OUTPUT_PATH = ${BUILD_DIR}/baton-xsoar.exe
 else
-OUTPUT_PATH = ${BUILD_DIR}/baton-demisto
+OUTPUT_PATH = ${BUILD_DIR}/baton-xsoar
 endif
 
 .PHONY: build
 build:
-	go build -o ${OUTPUT_PATH} ./cmd/baton-demisto
+	go build -o ${OUTPUT_PATH} ./cmd/baton-xsoar
 
 .PHONY: update-deps
 update-deps:

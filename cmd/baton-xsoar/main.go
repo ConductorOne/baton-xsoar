@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ConductorOne/baton-demisto/pkg/connector"
 	"github.com/conductorone/baton-sdk/pkg/cli"
 	"github.com/conductorone/baton-sdk/pkg/connectorbuilder"
 	"github.com/conductorone/baton-sdk/pkg/types"
+	"github.com/conductorone/baton-xsoar/pkg/connector"
 	"github.com/grpc-ecosystem/go-grpc-middleware/logging/zap/ctxzap"
 	"go.uber.org/zap"
 )
@@ -19,7 +19,7 @@ func main() {
 	ctx := context.Background()
 
 	cfg := &config{}
-	cmd, err := cli.NewCmd(ctx, "baton-demisto", cfg, validateConfig, getConnector)
+	cmd, err := cli.NewCmd(ctx, "baton-xsoar", cfg, validateConfig, getConnector)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
 		os.Exit(1)
@@ -38,13 +38,13 @@ func main() {
 func getConnector(ctx context.Context, cfg *config) (types.ConnectorServer, error) {
 	l := ctxzap.Extract(ctx)
 
-	demistoConnector, err := connector.New(ctx, cfg.AccessToken, cfg.ApiUrl, cfg.Unsafe)
+	xsoarConnector, err := connector.New(ctx, cfg.AccessToken, cfg.ApiUrl, cfg.Unsafe)
 	if err != nil {
 		l.Error("error creating connector", zap.Error(err))
 		return nil, err
 	}
 
-	connector, err := connectorbuilder.NewConnector(ctx, demistoConnector)
+	connector, err := connectorbuilder.NewConnector(ctx, xsoarConnector)
 	if err != nil {
 		l.Error("error creating connector", zap.Error(err))
 		return nil, err

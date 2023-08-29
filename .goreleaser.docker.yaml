@@ -1,10 +1,10 @@
-project_name: baton-demisto
+project_name: baton-xsoar
 builds:
-  - binary: baton-demisto
+  - binary: baton-xsoar
     env:
       - CGO_ENABLED=0
     id: linux
-    main: ./cmd/baton-demisto
+    main: ./cmd/baton-xsoar
     goos:
       - linux
     goarch:
@@ -15,37 +15,37 @@ dockers:
     goos: linux
     goarch: amd64
     image_templates:
-      - "ghcr.io/conductorone/baton-demisto:{{ .Version }}-amd64"
-      - "ghcr.io/conductorone/baton-demisto:latest-amd64"
+      - "ghcr.io/conductorone/baton-xsoar:{{ .Version }}-amd64"
+      - "ghcr.io/conductorone/baton-xsoar:latest-amd64"
     build_flag_templates:
       - "--platform=linux/amd64"
       - "--label=org.opencontainers.image.created={{.Date}}"
-      - "--label=org.opencontainers.image.title=baton-demisto"
+      - "--label=org.opencontainers.image.title=baton-xsoar"
       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
       - "--label=org.opencontainers.image.version={{.Version}}"
-      - "--label=org.opencontainers.image.source=https://github.com/conductorone/baton-demisto"
+      - "--label=org.opencontainers.image.source=https://github.com/conductorone/baton-xsoar"
   - use: buildx
     goos: linux
     goarch: arm64
     image_templates:
-      - "ghcr.io/conductorone/baton-demisto:{{ .Version }}-arm64"
-      - "ghcr.io/conductorone/baton-demisto:latest-arm64"
+      - "ghcr.io/conductorone/baton-xsoar:{{ .Version }}-arm64"
+      - "ghcr.io/conductorone/baton-xsoar:latest-arm64"
     build_flag_templates:
       - "--platform=linux/arm64/v8"
       - "--label=org.opencontainers.image.created={{.Date}}"
-      - "--label=org.opencontainers.image.title=baton-demisto"
+      - "--label=org.opencontainers.image.title=baton-xsoar"
       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
       - "--label=org.opencontainers.image.version={{.Version}}"
-      - "--label=org.opencontainers.image.source=https://github.com/conductorone/baton-demisto"
+      - "--label=org.opencontainers.image.source=https://github.com/conductorone/baton-xsoar"
 docker_manifests:
-  - name_template: ghcr.io/conductorone/baton-demisto:{{ .Version }}
+  - name_template: ghcr.io/conductorone/baton-xsoar:{{ .Version }}
     image_templates:
-      - ghcr.io/conductorone/baton-demisto:{{ .Version }}-amd64
-      - ghcr.io/conductorone/baton-demisto:{{ .Version }}-arm64
-  - name_template: ghcr.io/conductorone/baton-demisto:latest
+      - ghcr.io/conductorone/baton-xsoar:{{ .Version }}-amd64
+      - ghcr.io/conductorone/baton-xsoar:{{ .Version }}-arm64
+  - name_template: ghcr.io/conductorone/baton-xsoar:latest
     image_templates:
-      - ghcr.io/conductorone/baton-demisto:latest-amd64
-      - ghcr.io/conductorone/baton-demisto:latest-arm64
+      - ghcr.io/conductorone/baton-xsoar:latest-amd64
+      - ghcr.io/conductorone/baton-xsoar:latest-arm64
 checksum:
   disable: true
 release:
