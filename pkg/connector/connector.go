@@ -50,38 +50,12 @@ func (xs *Xsoar) Metadata(ctx context.Context) (*v2.ConnectorMetadata, error) {
 	}, nil
 }
 
-// Validate method checks for compatible and valid credentials.
-// Since each role can be configured to have different permissions,
-// we need to check if the provided credentials have the required
-// permissions to perform the operations.
+// Validate does a simple validation of the provided access token to confirm that the provided config is correct.
+// It does not validate that the provided token has all required permissions.
 func (xs *Xsoar) Validate(ctx context.Context) (annotations.Annotations, error) {
-	currentUser, err := xs.client.GetCurrentUser(ctx)
+	_, err := xs.client.GetCurrentUser(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Unauthenticated, "Provided Access Token is invalid - unable to get current user")
-	}
-
-	users, err := xs.client.GetUsers(ctx)
-	if err != nil {
-		return nil, status.Error(codes.Unauthenticated, "Provided Access Token is invalid - unable to get users")
-	}
-
-	_, err = xs.client.GetRoles(ctx)
-	if err != nil {
-		return nil, status.Error(codes.Unauthenticated, "Provided Access Token is invalid - unable to get roles")
-	}
-
-	targetUsers := removeUsers(users, "admin", currentUser.Id)
-	if len(targetUsers) == 0 {
-		return nil, nil
-	}
-
-	err = xs.client.UpdateUserRoles(
-		ctx,
-		targetUsers[0].Id,
-		flattenRoleNames(targetUsers[0].Roles),
-	)
-	if err != nil {
-		return nil, status.Error(codes.Unauthenticated, "Provided Access Token is invalid - unable to update user roles")
 	}
 
 	return nil, nil
