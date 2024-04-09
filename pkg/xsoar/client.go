@@ -97,11 +97,11 @@ type UpdateRolesBody struct {
 	Roles Roles  `json:"roles"`
 }
 
-func (c *Client) UpdateUserRoles(ctx context.Context, userId string, roleIds []string) error {
+func (c *Client) UpdateUserRoles(ctx context.Context, userId string, roleIDs []string) error {
 	data := UpdateRolesBody{
 		Id: userId,
 		Roles: Roles{
-			Roles: roleIds,
+			Roles: roleIDs,
 		},
 	}
 

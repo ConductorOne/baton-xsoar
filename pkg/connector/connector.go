@@ -67,11 +67,11 @@ func New(ctx context.Context, token, apiUrl string, unsafe bool) (*Xsoar, error)
 	}
 
 	// Skip TLS verification if flag `unsafe` is specified.
-	if unsafe { // #nosec G402
+	if unsafe {
 		options = append(
 			options,
 			uhttp.WithTLSClientConfig(
-				&tls.Config{InsecureSkipVerify: true},
+				&tls.Config{InsecureSkipVerify: true}, // #nosec G402
 			),
 		)
 	}
