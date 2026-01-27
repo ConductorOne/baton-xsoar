@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/conductorone/baton-sdk/pkg/cli"
+	cfg "github.com/conductorone/baton-xsoar/pkg/config"
+	"github.com/conductorone/baton-sdk/pkg/config"
 	"github.com/conductorone/baton-sdk/pkg/connectorbuilder"
+	"github.com/conductorone/baton-sdk/pkg/connectorrunner"
 	"github.com/conductorone/baton-sdk/pkg/types"
 	"github.com/conductorone/baton-xsoar/pkg/connector"
 	"github.com/grpc-ecosystem/go-grpc-middleware/logging/zap/ctxzap"
@@ -18,15 +20,19 @@ var version = "dev"
 func main() {
 	ctx := context.Background()
 
-	cfg := &config{}
-	cmd, err := cli.NewCmd(ctx, "baton-xsoar", cfg, validateConfig, getConnector)
+	_, cmd, err := config.DefineConfiguration(
+		ctx,
+		"baton-xsoar",
+		getConnector,
+		cfg.Config,
+		connectorrunner.WithDefaultCapabilitiesConnectorBuilder(&connector.Xsoar{}),
+	)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
 		os.Exit(1)
 	}
 
 	cmd.Version = version
-	cmdFlags(cmd)
 
 	err = cmd.Execute()
 	if err != nil {
@@ -35,20 +41,20 @@ func main() {
 	}
 }
 
-func getConnector(ctx context.Context, cfg *config) (types.ConnectorServer, error) {
+func getConnector(ctx context.Context, c *cfg.Xsoar) (types.ConnectorServer, error) {
 	l := ctxzap.Extract(ctx)
 
-	xsoarConnector, err := connector.New(ctx, cfg.AccessToken, cfg.ApiUrl, cfg.Unsafe)
+	xsoarConnector, err := connector.New(ctx, c.Token, c.ApiUrl, c.Unsafe)
 	if err != nil {
 		l.Error("error creating connector", zap.Error(err))
 		return nil, err
 	}
 
-	connector, err := connectorbuilder.NewConnector(ctx, xsoarConnector)
+	conn, err := connectorbuilder.NewConnector(ctx, xsoarConnector)
 	if err != nil {
 		l.Error("error creating connector", zap.Error(err))
 		return nil, err
 	}
 
-	return connector, nil
+	return conn, nil
 }
