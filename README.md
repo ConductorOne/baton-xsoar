@@ -1,6 +1,6 @@
 ![Baton Logo](./docs/images/baton-logo.png)
 
-# `baton-xsoar` [![Go Reference](https://pkg.go.dev/badge/github.com/conductorone/baton-xsoar.svg)](https://pkg.go.dev/github.com/conductorone/baton-xsoar) ![main ci](https://github.com/conductorone/baton-xsoar/actions/workflows/main.yaml/badge.svg)
+# `baton-xsoar` [![Go Reference](https://pkg.go.dev/badge/github.com/conductorone/baton-xsoar.svg)](https://pkg.go.dev/github.com/conductorone/baton-xsoar) ![verify](https://github.com/conductorone/baton-xsoar/actions/workflows/verify.yaml/badge.svg)
 
 `baton-xsoar` is a connector for xsoar (Cortex XSOAR) built using the [Baton SDK](https://github.com/conductorone/baton-sdk). It communicates with created instance of Cortex XSOAR API to sync data about users and their roles.
 
