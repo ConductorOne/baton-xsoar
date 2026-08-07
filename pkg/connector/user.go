@@ -32,13 +32,13 @@ func userResource(ctx context.Context, user *xsoar.User) (*v2.Resource, error) {
 
 	userTraitOptions := []resource.UserTraitOption{
 		resource.WithEmail(user.Email, true),
-		resource.WithUserProfile(profile),
 	}
+	var resourceOpts []resource.ResourceOption
 
 	if user.Disabled {
-		userTraitOptions = append(userTraitOptions, resource.WithStatus(v2.UserTrait_Status_STATUS_DISABLED))
+		resourceOpts = append(resourceOpts, resource.WithResourceStatus(v2.Status_RESOURCE_STATUS_DISABLED, ""))
 	} else {
-		userTraitOptions = append(userTraitOptions, resource.WithStatus(v2.UserTrait_Status_STATUS_ENABLED))
+		resourceOpts = append(resourceOpts, resource.WithResourceStatus(v2.Status_RESOURCE_STATUS_ENABLED, ""))
 	}
 
 	ret, err := resource.NewUserResource(
@@ -46,6 +46,7 @@ func userResource(ctx context.Context, user *xsoar.User) (*v2.Resource, error) {
 		resourceTypeUser,
 		user.Id,
 		userTraitOptions,
+		append(resourceOpts, resource.WithResourceProfile(profile))...,
 	)
 	if err != nil {
 		return nil, err
