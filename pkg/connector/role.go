@@ -41,7 +41,8 @@ func roleResource(ctx context.Context, role *xsoar.Role) (*v2.Resource, error) {
 		role.Name,
 		resourceTypeRole,
 		role.Id,
-		[]rs.RoleTraitOption{rs.WithRoleProfile(profile)},
+		[]rs.RoleTraitOption{},
+		rs.WithResourceProfile(profile),
 	)
 	if err != nil {
 		return nil, err
